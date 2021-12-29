@@ -1,9 +1,9 @@
 === Product Dropdown Widget for WooCommerce ===
-Contributors: razorfrog
+Contributors: Razorfrog
 Tags: woocommerce, widget, categories, products
-Donate link: http://razorfrog.com
+Donate link: https://razorfrog.com/
 Requires at least: 3.1
-Tested up to: 4.6
+Tested up to: 5.4
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -44,5 +44,9 @@ The Post Types Order Plugin defaults to overriding any wp_query to sort by menu 
 2. Example frontend view
 
 == Changelog ==
+
+= 1.01 =
+* Compatibility update
+
 = 1.0 =
 * Initial release

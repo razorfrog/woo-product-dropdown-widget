@@ -1,12 +1,13 @@
 <?php
 /*
 Plugin Name: Woo Product Dropdown Widget
-Plugin URI: http://razorfrog.com
+Plugin URI: https://razorfrog.com/plugin-release-woocommerce-dropdown-widget/
 Description: Display WooCommerce products by category in a dropdown menu widget
-Version: 1.0
+Version: 1.01
 Author: Razorfrog Web Design
-Author URI: http://profiles.wordpress.org/razorfrog
-License: GPLv3
+Author URI: https://razorfrog.com/
+License: GPLv2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
 */
 
 ////////////////////////////////////////
