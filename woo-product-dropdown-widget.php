@@ -3,16 +3,12 @@
 Plugin Name: Woo Product Dropdown Widget
 Plugin URI: https://razorfrog.com/plugin-release-woocommerce-dropdown-widget/
 Description: Display WooCommerce products by category in a dropdown menu widget
-Version: 1.01
+Version: 1.1.0
 Author: Razorfrog Web Design
 Author URI: https://razorfrog.com/
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 */
-
-////////////////////////////////////////
-// Register widget
-////////////////////////////////////////
 
 class rz_woo_category_widget extends WP_Widget {
 
@@ -24,9 +20,9 @@ class rz_woo_category_widget extends WP_Widget {
 		);
 	}
 	
-////////////////////////////////////////
-// Widget frontend
-////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
+	// Widget frontend
+	////////////////////////////////////////////////////////////////////////////////
 
 	public function widget( $args, $instance ) {
 	
@@ -96,77 +92,74 @@ class rz_woo_category_widget extends WP_Widget {
 	    echo $after_widget;  
 	}
 	
-////////////////////////////////////////
-// Widget backend - admin dashboard
-////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////
+	// Widget backend - admin dashboard
+	////////////////////////////////////////////////////////////////////////////////
 
 	public function form( $instance ) {
 		$instance = wp_parse_args( (array) $instance, $defaults );
 		$cat_dropdown = isset( $instance['cat_dropdown'] ) ? $instance['cat_dropdown'] : '';
 		
 		$product_categories_dropdown = wp_dropdown_categories( array(
-	        'taxonomy' => 'product_cat',
-	        'orderby' => 'slug',
-	        'hierarchical' => true,
-	        'echo' => false,
-	        'show_option_all' => 'Select Category',
-	        'show_count' => true,
-	        'selected' => $instance['cat_dropdown'],
-	        'name' => $this->get_field_name('cat_dropdown'),
-	        'id' => $this->get_field_id('cat_dropdown'),
-	        'class' => 'widefat',
-	        'show_option_all' => 'All Products',
-		) );
-     ?>
-    <p>
-      <label for="<?php echo $this->get_field_id( 'title' ); ?>">Title:</label>
-      <input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" value="<?php echo $instance['title']; ?>" />
-    </p>
+			'taxonomy' => 'product_cat',
+			'orderby' => 'slug',
+			'hierarchical' => true,
+			'echo' => false,
+			'show_option_all' => 'Select Category',
+			'show_count' => true,
+			'selected' => $instance['cat_dropdown'],
+			'name' => $this->get_field_name('cat_dropdown'),
+			'id' => $this->get_field_id('cat_dropdown'),
+			'class' => 'widefat',
+			'show_option_all' => 'All Products',
+		)); ?>
 		
-	<p>
-		<label for="<?php echo $this->get_field_id('cat_dropdown'); ?>"><?php _e('Category:'); ?></label>
-		<?php echo $product_categories_dropdown;  ?>
-	</p>	
-	
-	<p>
-		<label for="<?php echo $this->get_field_id('sort'); ?>"><?php _e('Sort by:'); ?></label>
-		<select class="widefat" id="<?php echo $this->get_field_id('sort'); ?>" name="<?php echo $this->get_field_name('sort'); ?>">
-		<?php
-			echo '<option'. selected( $instance['sort'], 'title' ) .' value="title">Product Name</option>';
-			echo '<option'. selected( $instance['sort'], 'menu_order' ) .' value="menu_order">Menu Order</option>';
-			echo '<option'. selected( $instance['sort'], 'price' ) .' value="price">Price</option>';
-			echo '<option'. selected( $instance['sort'], 'sales' ) .' value="sales">Total Sales</option>';
-			echo '<option'. selected( $instance['sort'], 'date' ) .' value="date">Date Published</option>';
-			echo '<option'. selected( $instance['sort'], 'modified' ) .' value="modified">Date Last Modified</option>';
-			echo '<option'. selected( $instance['sort'], 'comment_count' ) .' value="comment_count">Reviews</option>';
-			echo '<option'. selected( $instance['sort'], 'rand' ) .' value="rand">Random</option>';
-		?>
-		</select>
-	</p>
-	
-	<p>
-		<label for="<?php echo $this->get_field_id('order'); ?>"><?php _e('Sort Order:'); ?></label>
-		<select class="widefat" id="<?php echo $this->get_field_id('order'); ?>" name="<?php echo $this->get_field_name('order'); ?>">
-		<?php
-			echo '<option'. selected( $instance['order'], 'ASC' ) .' value="ASC">Ascending (A > Z)</option>';
-			echo '<option'. selected( $instance['order'], 'DESC' ) .' value="DESC">Descending (Z > A)</option>';
-		?>
-		</select>
-	</p>
-	
-    <p>
-      <label for="<?php echo $this->get_field_id( 'show_posts' ); ?>">Number of Products (Defaults to All):</label>
-      <input class="widefat" id="<?php echo $this->get_field_id( 'show_posts' ); ?>" name="<?php echo $this->get_field_name( 'show_posts' ); ?>" value="<?php echo $instance['show_posts']; ?>" />
-    </p>
-
-		<?php 
+		<p>
+			<label for="<?php echo $this->get_field_id( 'title' ); ?>">Title:</label>
+			<input type="text" class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" value="<?php echo $instance['title']; ?>" />
+		</p>
+		
+		<p>
+			<label for="<?php echo $this->get_field_id('cat_dropdown'); ?>"><?php _e('Category:'); ?></label>
+			<?php echo $product_categories_dropdown;  ?>
+		</p>	
+		
+		<p>
+			<label for="<?php echo $this->get_field_id('sort'); ?>"><?php _e('Sort by:'); ?></label>
+			<select class="widefat" id="<?php echo $this->get_field_id('sort'); ?>" name="<?php echo $this->get_field_name('sort'); ?>">
+				<?php
+				echo '<option'. selected( $instance['sort'], 'title' ) .' value="title">Product Name</option>';
+				echo '<option'. selected( $instance['sort'], 'menu_order' ) .' value="menu_order">Menu Order</option>';
+				echo '<option'. selected( $instance['sort'], 'price' ) .' value="price">Price</option>';
+				echo '<option'. selected( $instance['sort'], 'sales' ) .' value="sales">Total Sales</option>';
+				echo '<option'. selected( $instance['sort'], 'date' ) .' value="date">Date Published</option>';
+				echo '<option'. selected( $instance['sort'], 'modified' ) .' value="modified">Date Last Modified</option>';
+				echo '<option'. selected( $instance['sort'], 'comment_count' ) .' value="comment_count">Reviews</option>';
+				echo '<option'. selected( $instance['sort'], 'rand' ) .' value="rand">Random</option>';
+				?>
+			</select>
+		</p>
+		
+		<p>
+			<label for="<?php echo $this->get_field_id('order'); ?>"><?php _e('Sort Order:'); ?></label>
+			<select class="widefat" id="<?php echo $this->get_field_id('order'); ?>" name="<?php echo $this->get_field_name('order'); ?>">
+				<?php
+				echo '<option'. selected( $instance['order'], 'ASC' ) .' value="ASC">Ascending (A > Z)</option>';
+				echo '<option'. selected( $instance['order'], 'DESC' ) .' value="DESC">Descending (Z > A)</option>';
+				?>
+			</select>
+		</p>
+		
+		<p>
+			<label for="<?php echo $this->get_field_id( 'show_posts' ); ?>">Number of Products (Defaults to All):</label>
+			<input type="text" class="widefat" id="<?php echo $this->get_field_id( 'show_posts' ); ?>" name="<?php echo $this->get_field_name( 'show_posts' ); ?>" value="<?php echo $instance['show_posts']; ?>" />
+		</p><?php 
 	}
 
-
-////////////////////////////////////////
-// Sanitize widget form values as they are saved
-////////////////////////////////////////
-
+	////////////////////////////////////////////////////////////////////////////////
+	// Sanitize widget form values as they are saved
+	////////////////////////////////////////////////////////////////////////////////
+	
 	public function update( $new_instance, $old_instance ) {
 		$instance = array();
 		$instance['title'] = $new_instance['title'];
@@ -177,12 +170,11 @@ class rz_woo_category_widget extends WP_Widget {
 		return $instance;
 	}
 
-} //end widget class
-
-function register_rz_woo_dropdown_widget() {;
-  register_widget( 'rz_woo_category_widget' );
 }
 
 add_action( 'widgets_init', 'register_rz_woo_dropdown_widget' );
+function register_rz_woo_dropdown_widget() {;
+	register_widget( 'rz_woo_category_widget' );
+}
 
 ?>

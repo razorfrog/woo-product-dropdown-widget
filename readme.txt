@@ -3,8 +3,8 @@ Contributors: Razorfrog
 Tags: woocommerce, widget, categories, products
 Donate link: https://razorfrog.com/
 Requires at least: 3.1
-Tested up to: 5.4
-Stable tag: trunk
+Tested up to: 5.8.2
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -40,13 +40,19 @@ The widget can be configured to show individual product categories, an \"All Pro
 The Post Types Order Plugin defaults to overriding any wp_query to sort by menu order.  Visit Settings > Post Types Order and uncheck the Auto Sort option to avoid this problem. 
 
 == Screenshots ==
-1. Three example widgets: All Products, Top 5 most reviewed products in a single category, Top 10 most sold products in a single category
-2. Example frontend view
+1. Backend view example
+2. Frontend view example
 
 == Changelog ==
 
-= 1.01 =
+1.1.0
+
+* UI and compatibility updates
+
+1.0.1
+
 * Compatibility update
 
-= 1.0 =
-* Initial release
+1.0.0
+
+* Initial plugin creation
