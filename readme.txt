@@ -3,8 +3,8 @@ Contributors: Razorfrog
 Tags: woocommerce, widget, categories, products
 Donate link: https://razorfrog.com/
 Requires at least: 3.1
-Tested up to: 5.8.2
-Stable tag: 1.1.0
+Tested up to: 6.0
+Stable tag: 1.1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -45,13 +45,18 @@ The Post Types Order Plugin defaults to overriding any wp_query to sort by menu 
 
 == Changelog ==
 
+1.1.1
+
+* WP Core compatibility update
+
 1.1.0
 
-* UI and compatibility updates
+* UI improvements 
+* WP Core compatibility update
 
 1.0.1
 
-* Compatibility update
+* WP Core compatibility update
 
 1.0.0
 
