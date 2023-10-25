@@ -3,7 +3,7 @@
 Plugin Name: Woo Product Dropdown Widget
 Plugin URI: https://razorfrog.com/plugin-release-woocommerce-dropdown-widget/
 Description: Display WooCommerce products by category in a dropdown menu widget
-Version: 1.1.2
+Version: 1.1.3
 Author: Razorfrog Web Design
 Author URI: https://razorfrog.com/
 License: GPLv2 or later
@@ -97,6 +97,14 @@ class rz_woo_category_widget extends WP_Widget {
 	////////////////////////////////////////////////////////////////////////////////
 
 	public function form( $instance ) {
+	    $defaults = array(
+	        'cat_dropdown' => '', // Set the default value for cat_dropdown
+	        'title' => '',       // Set default values for other fields as needed
+	        'sort' => 'title',   // Default sort value
+	        'order' => 'ASC',    // Default order value
+	        'show_posts' => -1,  // Default show_posts value
+	    );
+	    
 		$instance = wp_parse_args( (array) $instance, $defaults );
 		$cat_dropdown = isset( $instance['cat_dropdown'] ) ? $instance['cat_dropdown'] : '';
 		
