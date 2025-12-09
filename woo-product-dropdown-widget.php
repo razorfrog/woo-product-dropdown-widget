@@ -1,187 +1,242 @@
 <?php
-/*
-Plugin Name: Woo Product Dropdown Widget
-Plugin URI: https://razorfrog.com/plugin-release-woocommerce-dropdown-widget/
-Description: Display WooCommerce products by category in a dropdown menu widget
-Version: 1.1.3
-Author: Razorfrog Web Design
-Author URI: https://razorfrog.com/
-License: GPLv2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
-*/
+
+/**
+ * Plugin Name:       Product Dropdown Widget for WooCommerce
+ * Plugin URI:        https://razorfrog.com/plugin-release-woocommerce-dropdown-widget/
+ * Description:       Display WooCommerce products by category in a dropdown menu widget.
+ * Version:           1.1.4
+ * Requires at least: 5.2
+ * Requires PHP:      7.2
+ * Author:            Razorfrog Web Design
+ * Author URI:        https://razorfrog.com/
+ * License:           GPLv2 or later
+ * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
+ * Text Domain:       woo-product-dropdown-widget
+ */
 
 class rz_woo_category_widget extends WP_Widget {
 
 	function __construct() {
 		parent::__construct(
 			'rz_woo_category_widget', // Base ID
-			__( 'WooCommerce Product Dropdown', 'text_domain' ), // Name
-			array( 'description' => __( 'Display products from a specific product category as dropdown.', 'text_domain' ), ) // Args
+			__( 'WooCommerce Product Dropdown', 'woo-product-dropdown-widget' ), // Name
+			array(
+				'description' => __( 'Display products from a specific product category as dropdown.', 'woo-product-dropdown-widget' ),
+			)
 		);
 	}
-	
+
 	////////////////////////////////////////////////////////////////////////////////
 	// Widget frontend
 	////////////////////////////////////////////////////////////////////////////////
 
 	public function widget( $args, $instance ) {
-	
-	    extract( $args );
-	    echo $before_widget;        
-	
-		$title = $instance['title'];
-		$show_posts = (is_numeric($instance['show_posts'])) ? $instance['show_posts'] : -1;
-		
+
+		extract( $args );
+		echo wp_kses_post( $before_widget );
+
+		$title        = isset( $instance['title'] ) ? $instance['title'] : '';
+		$show_posts   = ( isset( $instance['show_posts'] ) && is_numeric( $instance['show_posts'] ) ) ? $instance['show_posts'] : -1;
+		$sort         = isset( $instance['sort'] ) ? $instance['sort'] : '';
+		$order        = isset( $instance['order'] ) ? $instance['order'] : '';
+		$cat_dropdown = isset( $instance['cat_dropdown'] ) ? (int) $instance['cat_dropdown'] : 0;
+
 		$args = array( // defaults to all categories
-				'post_type' => 'product', 
-				'orderby' => $instance['sort'],
-				'order' => $instance['order'],
-				'numberposts' => $show_posts
-			);
-		$product_cat = "Products";
-		
-		if ($instance['cat_dropdown'] != 0) { // single product category
+			'post_type'   => 'product',
+			'orderby'     => $sort,
+			'order'       => $order,
+			'numberposts' => $show_posts,
+		);
+
+		$product_cat = 'Products';
+
+		if ( 0 !== $cat_dropdown ) { // single product category
 			$args['tax_query'] = array(
 				array(
 					'taxonomy' => 'product_cat',
 					'field'    => 'id',
-					'terms'    => $instance['cat_dropdown'],
+					'terms'    => $cat_dropdown,
 				),
 			);
-			$product_cat = get_cat_name($instance['cat_dropdown']);
+			$product_cat = get_cat_name( $cat_dropdown );
 		}
-		
-		if ($instance['sort'] == "price") { // order by price
-			$args['orderby'] = 'meta_value_num';
+
+		if ( 'price' === $sort ) { // order by price
+			$args['orderby']  = 'meta_value_num';
 			$args['meta_key'] = '_price';
-		} else if ($instance['sort'] == "sales") { // order by total sales
-			$args['orderby'] = 'meta_value_num';
+		} elseif ( 'sales' === $sort ) { // order by total sales
+			$args['orderby']  = 'meta_value_num';
 			$args['meta_key'] = 'total_sales';
 		}
-		
-		$posts = get_posts($args);
-		
-		if ($posts) {
-			echo '<div class="'.$this->widget_options['classname'].'-content">';
-					
-			if ( ! empty( $instance['title'] ) ) {
-				echo $before_title . apply_filters( 'widget_title', $instance['title'] ) . $after_title; 
+
+		$posts = get_posts( $args );
+
+		if ( $posts ) {
+			echo '<div class="' . esc_attr( $this->widget_options['classname'] ) . '-content">';
+
+			if ( ! empty( $title ) ) {
+				// Filter then escape the widget title.
+				$filtered_title = apply_filters( 'widget_title', $title );
+				echo wp_kses_post( $before_title ) . esc_html( $filtered_title ) . wp_kses_post( $after_title );
 			}
-			
+
 			echo '<select class="category-posts-dropdown" onchange="location = this.value;" style="width:100%">';
-			echo '<option value="">View '. $product_cat . '</option>';
-			
-			foreach ($posts as $post) {
-				
-				$additional = "";
-			
+			echo '<option value="">' . esc_html( 'View ' . $product_cat ) . '</option>';
+
+			foreach ( $posts as $post ) {
+
+				$additional = '';
+
 				// If sorted by reviews, show (count)
-				if (($instance['sort'] == "comment_count") && ($post->comment_count == 1)) { 
-					$additional = " (".$post->comment_count." Review)";
-				} else if (($instance['sort'] == "comment_count") && ($post->comment_count > 1)) {
-					$additional = " (".$post->comment_count." Reviews)";
+				if ( 'comment_count' === $sort && 1 === (int) $post->comment_count ) {
+					$additional = ' (' . absint( $post->comment_count ) . ' ' . __( 'Review', 'woo-product-dropdown-widget' ) . ')';
+				} elseif ( 'comment_count' === $sort && (int) $post->comment_count > 1 ) {
+					$additional = ' (' . absint( $post->comment_count ) . ' ' . __( 'Reviews', 'woo-product-dropdown-widget' ) . ')';
 				}
-			?>
-				<option value="<?php echo get_permalink($post->ID);?>"><?php echo $post->post_title . $additional;?></option>
-			<?php }
-				
+				?>
+				<option value="<?php echo esc_url( get_permalink( $post->ID ) ); ?>">
+					<?php echo esc_html( $post->post_title . $additional ); ?>
+				</option>
+				<?php
+			}
+
 			echo '</select>';
+			echo '</div>';
 		}
-		
-		echo '</div>';
-	    echo $after_widget;  
+
+		echo wp_kses_post( $after_widget );
 	}
-	
+
 	////////////////////////////////////////////////////////////////////////////////
 	// Widget backend - admin dashboard
 	////////////////////////////////////////////////////////////////////////////////
 
 	public function form( $instance ) {
-	    $defaults = array(
-	        'cat_dropdown' => '', // Set the default value for cat_dropdown
-	        'title' => '',       // Set default values for other fields as needed
-	        'sort' => 'title',   // Default sort value
-	        'order' => 'ASC',    // Default order value
-	        'show_posts' => -1,  // Default show_posts value
-	    );
-	    
-		$instance = wp_parse_args( (array) $instance, $defaults );
+		$defaults = array(
+			'cat_dropdown' => '',
+			'title'        => '',
+			'sort'         => 'title',
+			'order'        => 'ASC',
+			'show_posts'   => -1,
+		);
+
+		$instance     = wp_parse_args( (array) $instance, $defaults );
 		$cat_dropdown = isset( $instance['cat_dropdown'] ) ? $instance['cat_dropdown'] : '';
-		
-		$product_categories_dropdown = wp_dropdown_categories( array(
-			'taxonomy' => 'product_cat',
-			'orderby' => 'slug',
-			'hierarchical' => true,
-			'echo' => false,
-			'show_option_all' => 'Select Category',
-			'show_count' => true,
-			'selected' => $instance['cat_dropdown'],
-			'name' => $this->get_field_name('cat_dropdown'),
-			'id' => $this->get_field_id('cat_dropdown'),
-			'class' => 'widefat',
-			'show_option_all' => 'All Products',
-		)); ?>
-		
+
+		$product_categories_dropdown = wp_dropdown_categories(
+			array(
+				'taxonomy'        => 'product_cat',
+				'orderby'         => 'slug',
+				'hierarchical'    => true,
+				'echo'            => false,
+				'show_option_all' => __( 'All Products', 'woo-product-dropdown-widget' ),
+				'show_count'      => true,
+				'selected'        => $cat_dropdown,
+				'name'            => $this->get_field_name( 'cat_dropdown' ),
+				'id'              => $this->get_field_id( 'cat_dropdown' ),
+				'class'           => 'widefat',
+			)
+		);
+		?>
+
 		<p>
-			<label for="<?php echo $this->get_field_id( 'title' ); ?>">Title:</label>
-			<input type="text" class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" value="<?php echo $instance['title']; ?>" />
+			<label for="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>">
+				<?php esc_html_e( 'Title:', 'woo-product-dropdown-widget' ); ?>
+			</label>
+			<input type="text"
+				class="widefat"
+				id="<?php echo esc_attr( $this->get_field_id( 'title' ) ); ?>"
+				name="<?php echo esc_attr( $this->get_field_name( 'title' ) ); ?>"
+				value="<?php echo esc_attr( $instance['title'] ); ?>" />
 		</p>
-		
+
 		<p>
-			<label for="<?php echo $this->get_field_id('cat_dropdown'); ?>"><?php _e('Category:'); ?></label>
-			<?php echo $product_categories_dropdown;  ?>
-		</p>	
-		
+			<label for="<?php echo esc_attr( $this->get_field_id( 'cat_dropdown' ) ); ?>">
+				<?php esc_html_e( 'Category:', 'woo-product-dropdown-widget' ); ?>
+			</label>
+			<?php
+			// Markup is generated by wp_dropdown_categories() and is safe in the admin.
+			echo $product_categories_dropdown; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			?>
+		</p>
+
 		<p>
-			<label for="<?php echo $this->get_field_id('sort'); ?>"><?php _e('Sort by:'); ?></label>
-			<select class="widefat" id="<?php echo $this->get_field_id('sort'); ?>" name="<?php echo $this->get_field_name('sort'); ?>">
-				<?php
-				echo '<option'. selected( $instance['sort'], 'title' ) .' value="title">Product Name</option>';
-				echo '<option'. selected( $instance['sort'], 'menu_order' ) .' value="menu_order">Menu Order</option>';
-				echo '<option'. selected( $instance['sort'], 'price' ) .' value="price">Price</option>';
-				echo '<option'. selected( $instance['sort'], 'sales' ) .' value="sales">Total Sales</option>';
-				echo '<option'. selected( $instance['sort'], 'date' ) .' value="date">Date Published</option>';
-				echo '<option'. selected( $instance['sort'], 'modified' ) .' value="modified">Date Last Modified</option>';
-				echo '<option'. selected( $instance['sort'], 'comment_count' ) .' value="comment_count">Reviews</option>';
-				echo '<option'. selected( $instance['sort'], 'rand' ) .' value="rand">Random</option>';
-				?>
+			<label for="<?php echo esc_attr( $this->get_field_id( 'sort' ) ); ?>">
+				<?php esc_html_e( 'Sort by:', 'woo-product-dropdown-widget' ); ?>
+			</label>
+			<select class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'sort' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'sort' ) ); ?>">
+				<option value="title" <?php selected( $instance['sort'], 'title' ); ?>>
+					<?php esc_html_e( 'Product Name', 'woo-product-dropdown-widget' ); ?>
+				</option>
+				<option value="menu_order" <?php selected( $instance['sort'], 'menu_order' ); ?>>
+					<?php esc_html_e( 'Menu Order', 'woo-product-dropdown-widget' ); ?>
+				</option>
+				<option value="price" <?php selected( $instance['sort'], 'price' ); ?>>
+					<?php esc_html_e( 'Price', 'woo-product-dropdown-widget' ); ?>
+				</option>
+				<option value="sales" <?php selected( $instance['sort'], 'sales' ); ?>>
+					<?php esc_html_e( 'Total Sales', 'woo-product-dropdown-widget' ); ?>
+				</option>
+				<option value="date" <?php selected( $instance['sort'], 'date' ); ?>>
+					<?php esc_html_e( 'Date Published', 'woo-product-dropdown-widget' ); ?>
+				</option>
+				<option value="modified" <?php selected( $instance['sort'], 'modified' ); ?>>
+					<?php esc_html_e( 'Date Last Modified', 'woo-product-dropdown-widget' ); ?>
+				</option>
+				<option value="comment_count" <?php selected( $instance['sort'], 'comment_count' ); ?>>
+					<?php esc_html_e( 'Reviews', 'woo-product-dropdown-widget' ); ?>
+				</option>
+				<option value="rand" <?php selected( $instance['sort'], 'rand' ); ?>>
+					<?php esc_html_e( 'Random', 'woo-product-dropdown-widget' ); ?>
+				</option>
 			</select>
 		</p>
-		
+
 		<p>
-			<label for="<?php echo $this->get_field_id('order'); ?>"><?php _e('Sort Order:'); ?></label>
-			<select class="widefat" id="<?php echo $this->get_field_id('order'); ?>" name="<?php echo $this->get_field_name('order'); ?>">
-				<?php
-				echo '<option'. selected( $instance['order'], 'ASC' ) .' value="ASC">Ascending (A > Z)</option>';
-				echo '<option'. selected( $instance['order'], 'DESC' ) .' value="DESC">Descending (Z > A)</option>';
-				?>
+			<label for="<?php echo esc_attr( $this->get_field_id( 'order' ) ); ?>">
+				<?php esc_html_e( 'Sort Order:', 'woo-product-dropdown-widget' ); ?>
+			</label>
+			<select class="widefat" id="<?php echo esc_attr( $this->get_field_id( 'order' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'order' ) ); ?>">
+				<option value="ASC" <?php selected( $instance['order'], 'ASC' ); ?>>
+					<?php esc_html_e( 'Ascending (A > Z)', 'woo-product-dropdown-widget' ); ?>
+				</option>
+				<option value="DESC" <?php selected( $instance['order'], 'DESC' ); ?>>
+					<?php esc_html_e( 'Descending (Z > A)', 'woo-product-dropdown-widget' ); ?>
+				</option>
 			</select>
 		</p>
-		
+
 		<p>
-			<label for="<?php echo $this->get_field_id( 'show_posts' ); ?>">Number of Products (Defaults to All):</label>
-			<input type="text" class="widefat" id="<?php echo $this->get_field_id( 'show_posts' ); ?>" name="<?php echo $this->get_field_name( 'show_posts' ); ?>" value="<?php echo $instance['show_posts']; ?>" />
-		</p><?php 
+			<label for="<?php echo esc_attr( $this->get_field_id( 'show_posts' ) ); ?>">
+				<?php esc_html_e( 'Number of Products (Defaults to All):', 'woo-product-dropdown-widget' ); ?>
+			</label>
+			<input type="text"
+				class="widefat"
+				id="<?php echo esc_attr( $this->get_field_id( 'show_posts' ) ); ?>"
+				name="<?php echo esc_attr( $this->get_field_name( 'show_posts' ) ); ?>"
+				value="<?php echo esc_attr( $instance['show_posts'] ); ?>" />
+		</p>
+		<?php
 	}
 
 	////////////////////////////////////////////////////////////////////////////////
 	// Sanitize widget form values as they are saved
 	////////////////////////////////////////////////////////////////////////////////
-	
+
 	public function update( $new_instance, $old_instance ) {
-		$instance = array();
-		$instance['title'] = $new_instance['title'];
-		$instance['show_posts'] = sanitize_text_field($new_instance['show_posts']);
-		$instance['sort'] = sanitize_text_field($new_instance['sort']);
-		$instance['order'] = sanitize_text_field($new_instance['order']);
-		$instance['cat_dropdown'] = (int) $new_instance['cat_dropdown'];
+		$instance                 = array();
+		$instance['title']        = isset( $new_instance['title'] ) ? sanitize_text_field( $new_instance['title'] ) : '';
+		$instance['show_posts']   = isset( $new_instance['show_posts'] ) ? sanitize_text_field( $new_instance['show_posts'] ) : '';
+		$instance['sort']         = isset( $new_instance['sort'] ) ? sanitize_text_field( $new_instance['sort'] ) : '';
+		$instance['order']        = isset( $new_instance['order'] ) ? sanitize_text_field( $new_instance['order'] ) : '';
+		$instance['cat_dropdown'] = isset( $new_instance['cat_dropdown'] ) ? (int) $new_instance['cat_dropdown'] : 0;
 		return $instance;
 	}
 
 }
 
 add_action( 'widgets_init', 'register_rz_woo_dropdown_widget' );
-function register_rz_woo_dropdown_widget() {;
+function register_rz_woo_dropdown_widget() {
 	register_widget( 'rz_woo_category_widget' );
 }
 
