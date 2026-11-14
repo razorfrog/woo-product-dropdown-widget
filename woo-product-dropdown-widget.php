@@ -4,7 +4,7 @@
  * Plugin Name:       Product Dropdown Widget for WooCommerce
  * Plugin URI:        https://razorfrog.com/plugin-release-woocommerce-dropdown-widget/
  * Description:       Display WooCommerce products by category in a dropdown menu widget.
- * Version:           1.1.4
+ * Version:           1.1.5
  * Requires at least: 5.2
  * Requires PHP:      7.2
  * Author:            Razorfrog Web Design
