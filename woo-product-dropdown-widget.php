@@ -14,6 +14,8 @@
  * Text Domain:       woo-product-dropdown-widget
  */
 
+defined( 'ABSPATH' ) || exit;
+
 class rz_woo_category_widget extends WP_Widget {
 
 	function __construct() {
@@ -58,7 +60,8 @@ class rz_woo_category_widget extends WP_Widget {
 					'terms'    => $cat_dropdown,
 				),
 			);
-			$product_cat = get_cat_name( $cat_dropdown );
+			$term        = get_term( $cat_dropdown, 'product_cat' );
+			$product_cat = ( $term && ! is_wp_error( $term ) ) ? $term->name : 'Products';
 		}
 
 		if ( 'price' === $sort ) { // order by price
@@ -80,7 +83,7 @@ class rz_woo_category_widget extends WP_Widget {
 				echo wp_kses_post( $before_title ) . esc_html( $filtered_title ) . wp_kses_post( $after_title );
 			}
 
-			echo '<select class="category-posts-dropdown" onchange="location = this.value;" style="width:100%">';
+			echo '<select class="category-posts-dropdown" aria-label="' . esc_attr( 'View ' . $product_cat ) . '" onchange="if (this.value) { location = this.value; }" style="width:100%">';
 			echo '<option value="">' . esc_html( 'View ' . $product_cat ) . '</option>';
 
 			foreach ( $posts as $post ) {
