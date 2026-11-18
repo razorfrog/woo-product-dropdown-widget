@@ -4,7 +4,7 @@ Tags: woocommerce, woo, widget, categories, products
 Requires at least: 5.2
 Tested up to: 7.1
 Requires PHP: 7.2
-Stable tag: 1.1.5
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -44,6 +44,10 @@ The Post Types Order Plugin defaults to overriding any wp_query to sort by menu 
 2. Frontend view example
 
 == Changelog ==
+
+1.2.0
+
+* Added "Get help" and "Leave a review" links to the plugin's row on the Plugins screen
 
 1.1.5
 

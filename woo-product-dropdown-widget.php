@@ -4,7 +4,7 @@
  * Plugin Name:       Product Dropdown Widget for WooCommerce
  * Plugin URI:        https://razorfrog.com/plugin-release-woocommerce-dropdown-widget/
  * Description:       Display WooCommerce products by category in a dropdown menu widget.
- * Version:           1.1.5
+ * Version:           1.2.0
  * Requires at least: 5.2
  * Requires PHP:      7.2
  * Author:            Razorfrog Web Design
@@ -242,5 +242,36 @@ add_action( 'widgets_init', 'register_rz_woo_dropdown_widget' );
 function register_rz_woo_dropdown_widget() {
 	register_widget( 'rz_woo_category_widget' );
 }
+
+/******************************************************************************************************************/
+/* Plugins screen: help and review links. */
+/******************************************************************************************************************/
+
+/**
+ * Adds "Get help" and "Leave a review" links to this plugin's row on the Plugins screen.
+ *
+ * @param string[] $links Existing row meta links.
+ * @param string   $file  Plugin basename.
+ * @return string[]
+ */
+function rz_woo_dropdown_row_meta( $links, $file ) {
+	if ( plugin_basename( __FILE__ ) !== $file ) {
+		return $links;
+	}
+
+	$links[] = sprintf(
+		'<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>',
+		esc_url( 'https://wordpress.org/support/plugin/woo-product-dropdown-widget/' ),
+		esc_html__( 'Get help', 'woo-product-dropdown-widget' )
+	);
+	$links[] = sprintf(
+		'<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>',
+		esc_url( 'https://wordpress.org/support/plugin/woo-product-dropdown-widget/reviews/#new-post' ),
+		esc_html__( 'Leave a review', 'woo-product-dropdown-widget' )
+	);
+
+	return $links;
+}
+add_filter( 'plugin_row_meta', 'rz_woo_dropdown_row_meta', 10, 2 );
 
 ?>
